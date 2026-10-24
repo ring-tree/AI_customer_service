@@ -48,9 +48,9 @@ description_en: "Mandatory work-log recording at task close-out. Invoke when a t
 
 | 层级 | 位置 | 写什么 | 不写什么 |
 |---|---|---|---|
-| **L1 主日志（权威）** | `工作日志.md`（项目根目录） | 按第 1 节四项字段的完整任务块；当日概览；问题台账；遗留事项 | 大段技术细节、调试输出 |
+| **L1 主日志（权威）** | `docs/worklog.md`（项目根目录） | 按第 1 节四项字段的完整任务块；当日概览；问题台账；遗留事项 | 大段技术细节、调试输出 |
 | **L2 内部记忆** | `.workbuddy/memory/YYYY-MM-DD.md` | 环境事实、踩坑原文、命令、路径、结论；长期事实写入同目录 `MEMORY.md` | 与 L1 重复的完整叙述 |
-| **L3 专项证据** | `test-evidence/<日期或主题>/` | 测试脚本、结果日志、服务日志、截图 | 结论性文字（放 L1） |
+| **L3 专项证据** | `tests/evidence/<日期或主题>/` | 测试脚本、结果日志、服务日志、截图 | 结论性文字（放 L1） |
 
 原则：**L1 讲"做了什么、结果如何"；L2 讲"怎么做的、下次注意什么"；L3 是证据。** 三者用路径互相引用，不复制整段。
 
@@ -68,7 +68,7 @@ description_en: "Mandatory work-log recording at task close-out. Invoke when a t
 
 模板与填好的样例见 `templates/task-block.md`（本 skill 目录下）。
 
-写入位置：`工作日志.md` 当日分区（`## YYYY-MM-DD（周X）`）的 `### 任务记录` 小节末尾；该小节不存在则新建。
+写入位置：`docs/worklog.md` 当日分区（`## YYYY-MM-DD（周X）`）的 `### 任务记录` 小节末尾；该小节不存在则新建。
 
 标题行固定为四级标题：`#### T-20261020-01 ｜ <动词开头的短标题>`。
 
@@ -80,7 +80,7 @@ description_en: "Mandatory work-log recording at task close-out. Invoke when a t
 - **任务时间**：2026-10-20 10:00 → 10:25（GMT+8，约 25 分钟）
 - **任务输入**：用户反馈登录偶发 500；引用 service/auth.py、logs/app.log
 - **执行过程**：1) 复现，3/10 失败；2) 定位 token 过期分支未捕获；3) 补 try/except 并加单测
-- **任务产出**：`service/auth.py`（修改）；单测 4/4 通过，证据 `test-evidence/2026-10-20/auth.log`；结论：已修复
+- **任务产出**：`service/auth.py`（修改）；单测 4/4 通过，证据 `tests/evidence/2026-10-20/auth.log`；结论：已修复
 ```
 
 ---

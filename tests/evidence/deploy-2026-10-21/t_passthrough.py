@@ -17,7 +17,7 @@ CAPTURED = {}
 MOCK_PORT = 11499
 GW_PORT = 11435
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-GW_DIR = os.path.join(ROOT, "class1", "02api-proxy")
+GW_DIR = os.path.join(ROOT, "services", "model-gateway")
 
 
 class MockHandler(BaseHTTPRequestHandler):

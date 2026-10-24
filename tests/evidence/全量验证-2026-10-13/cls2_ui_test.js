@@ -2,7 +2,7 @@
 const fs = require('fs');
 const CDP_BASE = 'http://127.0.0.1:9444';
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-const OUT = 'E:/csk_project/class3/.tmp_verify';
+const OUT = 'E:/csk_project/services/knowledge-rag/.tmp_verify';
 const results = [];
 const rec = (name, ok, detail) => {
   results.push({ name, ok });

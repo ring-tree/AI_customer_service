@@ -1,7 +1,7 @@
 # Agent.md —— 本仓库的执行约束
 
 > 这是**常驻约束层**，只写三件事：这仓库怎么跑、哪些地方不许碰、收尾要做什么。
-> 细节不在这里：架构与端口 → [`README.md`](README.md)｜记录格式 → [`.workbuddy/skills/worklog/`](.workbuddy/skills/worklog/SKILL.md)｜历史 → [`工作日志.md`](工作日志.md)
+> 细节不在这里：架构与端口 → [`README.md`](README.md)｜记录格式 → [`.workbuddy/skills/worklog/`](.workbuddy/skills/worklog/SKILL.md)｜历史 → [`docs/worklog.md`](docs/worklog.md)
 
 ---
 
@@ -11,11 +11,11 @@
 
 | 服务 | 目录 | 端口 | 角色 |
 |---|---|---|---|
-| A1 模型网关 | `class1/02api-proxy` | 11434 | OpenAI 兼容，多厂商适配 |
-| A2 客服工作台 | `class2/web_ui` | 3098 | 唯一 UI 入口，三模式切换 |
-| A3 RAG 知识服务 | `class3` | 14052 | LangGraph 自适应检索 |
+| A1 模型网关 | `services/model-gateway` | 11434 | OpenAI 兼容，多厂商适配 |
+| A2 客服工作台 | `web/customer-console` | 3098 | 唯一 UI 入口，三模式切换 |
+| A3 RAG 知识服务 | `services/knowledge-rag` | 14052 | LangGraph 自适应检索 |
 
-启动顺序：**class3 → class1 → class2**。依赖方向：A2 → A1（代理模式）、A2 → A3（RAG 模式）。
+启动顺序：**services/knowledge-rag → class1 → class2**。依赖方向：A2 → A1（代理模式）、A2 → A3（RAG 模式）。
 
 ---
 
@@ -25,9 +25,9 @@
 
 ```powershell
 # 启动（三个终端，或后台运行）
-cd class3          && ./.venv/Scripts/python.exe server.py
-cd class1/02api-proxy && npm start
-cd class2/web_ui   && npm run dev
+cd services/knowledge-rag          && ./.venv/Scripts/python.exe server.py
+cd services/model-gateway && npm start
+cd web/customer-console   && npm run dev
 
 # 健康检查（三端都应 200）
 curl -s http://127.0.0.1:14052/health
@@ -35,12 +35,12 @@ curl -s http://localhost:11434/health
 curl -s -o /dev/null -w "%{http_code}" http://localhost:3098/
 
 # 前端构建 / 类型检查
-cd class2/web_ui && npm run build
+cd web/customer-console && npm run build
 
 # 回归脚本（需先起服务；UI 用例另需 Chrome --remote-debugging-port=9445）
-cd test-evidence/deploy-2026-10-20
+cd tests/evidence/deploy-2026-10-20
 python t_class1.py    # A1 接口 8 项
-python t_class3.py    # A3 接口 8 项，约 5 分钟
+python t_services/knowledge-rag.py    # A3 接口 8 项，约 5 分钟
 node   t_class2_ui.js # A2 浏览器端到端
 
 # 工作日志格式校验
@@ -72,7 +72,7 @@ python .workbuddy/skills/worklog/scripts/check_log.py
 
 任务产生文件改动、部署、测试结论或删除操作时，**结束前调用 `worklog` skill** 落账，并用其中的 `check_log.py` 自检。
 
-> 兜底：若当前环境无法加载 skill，至少在 `工作日志.md` 追加四行——**任务时间 / 任务输入 / 执行过程 / 任务产出**，不得无记录结束。
+> 兜底：若当前环境无法加载 skill，至少在 `docs/worklog.md` 追加四行——**任务时间 / 任务输入 / 执行过程 / 任务产出**，不得无记录结束。
 
 ---
 
@@ -82,7 +82,7 @@ python .workbuddy/skills/worklog/scripts/check_log.py
 |---|---|
 | 架构、端口、完整启动与配置 | `README.md` |
 | 记录怎么写、模板、校验 | `.workbuddy/skills/worklog/SKILL.md` |
-| 历次任务与问题台账 | `工作日志.md` |
-| 最新部署与测试结论 | `工作日志.md`（T-20261021-01）或 `test-evidence/deploy-2026-10-21/` |
-| 三者关系与整合约束 | `三项目协同关系分析.md` |
-| 测试脚本与证据 | `test-evidence/<日期或主题>/` |
+| 历次任务与问题台账 | `docs/worklog.md` |
+| 最新部署与测试结论 | `docs/worklog.md`（T-20261021-01）或 `tests/evidence/deploy-2026-10-21/` |
+| 三者关系与整合约束 | `docs/architecture.md` |
+| 测试脚本与证据 | `tests/evidence/<日期或主题>/` |

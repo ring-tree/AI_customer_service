@@ -22,7 +22,7 @@ import re
 import sys
 from pathlib import Path
 
-DEFAULT_LOG = Path(__file__).resolve().parents[4] / "工作日志.md"
+DEFAULT_LOG = Path(__file__).resolve().parents[4] / "docs" / "worklog.md"
 
 RE_BLOCK = re.compile(r"^####\s+(T-\d{8}-\d{2})\s*[｜|]\s*(.+?)\s*$")
 RE_SECTION = re.compile(r"^##\s+(\d{4}-\d{2}-\d{2})")

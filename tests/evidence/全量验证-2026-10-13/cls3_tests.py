@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""V3: class3 (LangGraphRAG :14052) 全量接口与边界验证"""
+"""V3: services/knowledge-rag (LangGraphRAG :14052) 全量接口与边界验证"""
 import json
 import time
 import urllib.error
@@ -96,6 +96,6 @@ s, _, c, _ = req("GET", "/chat", timeout=15)
 record("12. GET /chat → 405 方法约束", s == 405, f"{s}")
 
 print()
-print(f"==== class3 汇总: PASS {len(PASS)} / FAIL {len(FAIL)} ====")
+print(f"==== services/knowledge-rag 汇总: PASS {len(PASS)} / FAIL {len(FAIL)} ====")
 if FAIL:
     print("FAILED:", FAIL)
