@@ -7,6 +7,7 @@ import {
   DEFAULT_RAG_URL,
   type Settings,
 } from '../stores/setting'
+import { fetchWithTimeout } from './api'
 
 const normalizeBaseUrl = (url: string) => url.trim().replace(/\/+$/, '')
 
@@ -50,14 +51,19 @@ export const createRagChat = async (
   }
 
   // TODO(学生)-6
-  const res = await fetch(`${getRagBaseUrl(settings)}/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      question: questionText,
-      session_id: sessionId || null,
-    }),
-  })
+  // F10：RAG 单问 50~95s（4~8 次串行模型调用），超时阈值 180s
+  const res = await fetchWithTimeout(
+    `${getRagBaseUrl(settings)}/chat`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: questionText,
+        session_id: sessionId || null,
+      }),
+    },
+    180000
+  )
 
   if (!res.ok) {
     throw new Error(`RAG 请求错误：${res.status}`)
@@ -71,7 +77,7 @@ export const resetRagSession = async (sessionId: string) => {
   const settings = useSettingStore.getState().settings
   const url = `${getRagBaseUrl(settings)}/chat/reset?session_id=${encodeURIComponent(sessionId)}`
 
-  const res = await fetch(url, { method: 'POST' })
+  const res = await fetchWithTimeout(url, { method: 'POST' }, 15000)
 
   if (!res.ok) {
     throw new Error(`重置 RAG 会话失败：${res.status}`)
@@ -79,7 +85,7 @@ export const resetRagSession = async (sessionId: string) => {
 }
 
 export const testRagConnection = async (settings: Settings) => {
-  const res = await fetch(`${getRagBaseUrl(settings)}/health`)
+  const res = await fetchWithTimeout(`${getRagBaseUrl(settings)}/health`, {}, 10000)
   if (!res.ok) {
     throw new Error(`连接失败：${res.status}`)
   }

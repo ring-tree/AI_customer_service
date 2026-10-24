@@ -205,8 +205,13 @@ const HomePage = () => {
     try {
       // TODO(学生)-5：补全 LLM（必做）/ RAG（依赖 TODO-6）发送与流式更新
       // 1) 先改标题（此时会话还没有消息），再依次写入 user 消息与 assistant 占位气泡
+      // F3：文本附件内容拼入用户消息（进入 LLM 历史与 RAG 问句）；标题仍用纯文本
+      const fileCtx = messageContent.files
+        .map((f) => (f.content ? `\n\n【附件 ${f.name}】\n${f.content}` : ''))
+        .join('')
+      const fullText = text + fileCtx
       maybeRenameSession(text)
-      addMessage(messageHandler.formatMessage('user', text, '', messageContent.files))
+      addMessage(messageHandler.formatMessage('user', fullText, '', messageContent.files))
       addMessage(messageHandler.formatMessage('assistant', ''))
       // 占位气泡进入 loading，流式增量会不断覆写它
       updateLastMessage('', '', 0, 0, true)
@@ -216,7 +221,7 @@ const HomePage = () => {
       if (isRagMode) {
         const state = useChatStore.getState()
         const conv = state.conversations.find((c) => c.id === state.currentConversationId)
-        const result = await createRagChat(text, conv?.ragSessionId)
+        const result = await createRagChat(fullText, conv?.ragSessionId)
 
         setRagSessionId(state.currentConversationId, result.session_id)
         updateLastMessage(result.answer, '', 0, 0, false, {

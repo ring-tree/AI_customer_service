@@ -11,6 +11,7 @@ export interface FileItem {
   url: string
   type: 'image' | 'file'
   size: number
+  content?: string // F3：文本附件内容（≤8000 字符），随消息进入 prompt
 }
 
 export interface RagSource {

@@ -35,7 +35,7 @@ export const CUSTOM_MODEL_VALUE = '__custom__'
 
 // 默认设置与本地持久化迁移（旧版 DeepSeek/混元 URL 会洗成 TokenHub 直连）
 const defaultSettings: Settings = {
-  connectionMode: 'direct',
+  connectionMode: 'proxy', // F8：默认走模型网关，开箱即用（网关在服务端持钥）
   apiBaseUrl: DEFAULT_API_BASE_URL,
   proxyUrl: DEFAULT_PROXY_URL,
   ragUrl: DEFAULT_RAG_URL,

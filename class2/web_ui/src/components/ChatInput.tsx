@@ -15,7 +15,6 @@ const ChatInput = ({ loading, onSend }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState('')
   const [fileList, setFileList] = useState<FileItem[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const imageInputRef = useRef<HTMLInputElement>(null)
 
   const handleSend = () => {
     if ((!inputValue.trim() && fileList.length === 0) || loading) return
@@ -31,7 +30,7 @@ const ChatInput = ({ loading, onSend }: ChatInputProps) => {
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
@@ -41,6 +40,16 @@ const ChatInput = ({ loading, onSend }: ChatInputProps) => {
       url: URL.createObjectURL(file),
       type: type === 'image' ? 'image' : 'file',
       size: file.size,
+    }
+
+    // F3：文本附件读取内容（截断 8000 字符），供 handleSend 拼入 prompt
+    if (type === 'file') {
+      try {
+        const raw = await file.text()
+        fileItem.content = raw.length > 8000 ? raw.slice(0, 8000) + '\n…[已截断]' : raw
+      } catch {
+        fileItem.content = ''
+      }
     }
 
     setFileList([...fileList, fileItem])
@@ -100,7 +109,7 @@ const ChatInput = ({ loading, onSend }: ChatInputProps) => {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.doc,.docx,.txt"
+          accept=".txt,.md,.csv"
           style={{ display: 'none' }}
           onChange={(e) => handleFileChange(e, 'file')}
         />
@@ -108,14 +117,10 @@ const ChatInput = ({ loading, onSend }: ChatInputProps) => {
           <img src="/src/assets/photo/附件.png" alt="link" />
         </button>
 
-        <input
-          ref={imageInputRef}
-          type="file"
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={(e) => handleFileChange(e, 'image')}
-        />
-        <button className="action-btn" onClick={() => imageInputRef.current?.click()}>
+        <button
+          className="action-btn"
+          onClick={() => alert('图片解析暂不支持，请上传 .txt / .md / .csv 文本附件')}
+        >
           <img src="/src/assets/photo/图片.png" alt="picture" />
         </button>
 

@@ -17,6 +17,27 @@ import { testRagConnection } from './ragApi'
 const normalizeBaseUrl = (url: string) => url.trim().replace(/\/+$/, '')
 
 // ---------------------------------------------------------------------------
+// F10：统一超时与中止封装——服务不可达/卡住时抛可读错误，替代全部裸 fetch
+// 用法：fetchWithTimeout(url, options, ms)；超时抛「请求超时（Ns）」
+// ---------------------------------------------------------------------------
+export const fetchWithTimeout = (url: string, options: RequestInit = {}, ms = 60000) => {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), ms)
+  return fetch(url, { ...options, signal: controller.signal })
+    .catch((err) => {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error(`请求超时（${Math.round(ms / 1000)}s），请检查服务是否正常运行`)
+      }
+      // 连接被拒/重置时浏览器统一抛 TypeError: Failed to fetch —— 映射为中文可读提示
+      if (err instanceof TypeError && /fetch/i.test(err.message)) {
+        throw new Error('无法连接服务：请确认对应服务已启动且地址正确')
+      }
+      throw err
+    })
+    .finally(() => clearTimeout(timer))
+}
+
+// ---------------------------------------------------------------------------
 // TODO-1 / TODO-2：路径拼接 + 按 connectionMode 选择上游基址
 // 供下方 getChatCompletionsUrl / getModelsUrl / getHealthUrl 以及 TODO-3 使用
 // ---------------------------------------------------------------------------
@@ -91,7 +112,7 @@ export const fetchProxyModels = async (proxyUrl?: string): Promise<ModelOption[]
     proxyUrl: proxyUrl || settings.proxyUrl || DEFAULT_PROXY_URL,
   }
 
-  const res = await fetch(getModelsUrl(probeSettings))
+  const res = await fetchWithTimeout(getModelsUrl(probeSettings), {}, 15000)
   if (!res.ok) {
     throw new Error(`获取模型列表失败：${res.status}`)
   }
@@ -117,14 +138,16 @@ export const testConnection = async (settings: Settings) => {
 
   if (!isTokenHubBase(settings)) {
     const healthUrl = getHealthUrl(settings)
-    const res = await fetch(healthUrl)
+    const res = await fetchWithTimeout(healthUrl, {}, 15000)
     if (res.ok) return true
   }
 
   const modelsUrl = getModelsUrl(settings)
-  const modelsRes = await fetch(modelsUrl, {
-    headers: buildHeaders(settings),
-  })
+  const modelsRes = await fetchWithTimeout(
+    modelsUrl,
+    { headers: buildHeaders(settings) },
+    15000
+  )
   if (!modelsRes.ok) {
     let detail = ''
     try {
@@ -182,11 +205,15 @@ export const createChatCompletion = async (
     payload.stream_options = { include_usage: true }
   }
 
-  const res = await fetch(getChatCompletionsUrl(setting), {
-    method: 'POST',
-    headers: buildHeaders(setting),
-    body: JSON.stringify(payload),
-  })
+  const res = await fetchWithTimeout(
+    getChatCompletionsUrl(setting),
+    {
+      method: 'POST',
+      headers: buildHeaders(setting),
+      body: JSON.stringify(payload),
+    },
+    60000
+  )
 
   if (!res.ok) {
     let detail = ''
