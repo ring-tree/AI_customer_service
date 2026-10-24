@@ -1,0 +1,14 @@
+[
+  {
+    "name": "X1 代理不可达：有错误提示且 loading 结束",
+    "ok": true
+  },
+  {
+    "name": "X2 RAG 不可达：有错误提示且 loading 结束",
+    "ok": true
+  },
+  {
+    "name": "X3 直连空 Key：给出明确提示",
+    "ok": true
+  }
+]

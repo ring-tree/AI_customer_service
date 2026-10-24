@@ -1,0 +1,12 @@
+node_modules/
+.venv/
+.venv_broken_20261024/
+db_md/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+_archive/backup-*/
+.chrome-profile/
+__pycache__/

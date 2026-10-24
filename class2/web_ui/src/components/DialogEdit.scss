@@ -1,0 +1,108 @@
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.dialog-container {
+  background: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.dialog-body {
+  padding: 20px;
+
+  .dialog-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: #3f7af1;
+    }
+  }
+
+  .delete-warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #606266;
+
+    .warning-icon {
+      color: #ed3336;
+      font-size: 20px;
+    }
+  }
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+
+  .dialog-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.cancel-btn {
+      background: #f5f5f5;
+      color: #333;
+
+      &:hover {
+        background: #e5e5e5;
+      }
+    }
+
+    &.primary-btn {
+      background: #3f7af1;
+      color: #fff;
+
+      &:hover {
+        background: #3266d6;
+      }
+    }
+
+    &.danger-btn {
+      background: #ed3336;
+      color: #fff;
+
+      &:hover {
+        background: #d32f2f;
+      }
+    }
+  }
+}
+
+
+
+

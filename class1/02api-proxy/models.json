@@ -1,0 +1,30 @@
+{
+    "hy3": {
+        "provider": "hunyuan",
+        "model": "hy3"
+    },
+    "hy3-preview": {
+        "provider": "hunyuan",
+        "model": "hy3-preview"
+    },
+    "hunyuan-role-latest": {
+        "provider": "hunyuan",
+        "model": "hunyuan-role-latest"
+    },
+    "deepseek-chat": {
+        "provider": "deepseek",
+        "model": "deepseek-chat"
+    },
+    "deepseek-reasoner": {
+        "provider": "deepseek",
+        "model": "deepseek-reasoner"
+    },
+    "glm-4-flash": {
+        "provider": "zhipu",
+        "model": "glm-4-flash"
+    },
+    "kimi-k2": {
+        "provider": "kimi",
+        "model": "moonshot-v1-8k"
+    }
+}
