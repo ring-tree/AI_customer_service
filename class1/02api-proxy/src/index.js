@@ -257,6 +257,11 @@ const buildOpenAIChatBody = (modelConfig, messages, options = {}, stream = false
         body.stream_options = options.stream_options ?? { include_usage: true };
     }
 
+    // F1：结构化输出与工具调用字段透传（下游 LangChain with_structured_output 依赖）
+    if (options.response_format && typeof options.response_format === 'object') body.response_format = options.response_format;
+    if (Array.isArray(options.tools)) body.tools = options.tools;
+    if (options.tool_choice) body.tool_choice = options.tool_choice;
+
     return body;
 };
 
@@ -396,6 +401,7 @@ const streamOpenAICompatibleFetch = async (response, modelConfig, messages, opti
     const decoder = new TextDecoder();
     let buffer = '';
     let sentRole = false;
+    let finishSent = false; // F9：上游已发过 finish 帧时，收尾不再补发
 
     while (true) {
       const { done, value } = await reader.read();
@@ -430,6 +436,7 @@ const streamOpenAICompatibleFetch = async (response, modelConfig, messages, opti
 
         if (Object.keys(outDelta).length > 0 || finishReason) {
           writeOpenAISSE(response, openAIChunk(id, created, outModel, outDelta, finishReason));
+          if (finishReason) finishSent = true;
         }
 
         const usage = normalizeOpenAIUsage(parsed.usage);
@@ -439,7 +446,10 @@ const streamOpenAICompatibleFetch = async (response, modelConfig, messages, opti
       }
     }
 
-    writeOpenAISSE(response, openAIChunk(id, created, outModel, {}, 'stop'));
+    // F9：仅当上游未发过 finish 帧时补一条 stop，避免重复
+    if (!finishSent) {
+      writeOpenAISSE(response, openAIChunk(id, created, outModel, {}, 'stop'));
+    }
     response.write('data: [DONE]\n\n');
     response.end();
   } catch (error) {
@@ -510,7 +520,8 @@ const handleOpenAIChatCompletions = async (request, response) => {
   try {
     // TODO(学生)-6：补全本函数
     const body = await getBody(request);
-    const { model, messages = [], stream = false, temperature, top_p, max_tokens, stream_options } = body;
+    // F1：解构补 response_format / tools / tool_choice（结构化输出与工具调用透传）
+    const { model, messages = [], stream = false, temperature, top_p, max_tokens, stream_options, response_format, tools, tool_choice } = body;
 
     if (!model) {
       return sendOpenAIError(response, 'Missing required parameter: model', 400, 'invalid_request_error');
@@ -526,6 +537,10 @@ const handleOpenAIChatCompletions = async (request, response) => {
     if (typeof top_p === 'number') options.top_p = top_p;
     if (typeof max_tokens === 'number') options.num_predict = max_tokens;
     if (stream_options && typeof stream_options === 'object') options.stream_options = stream_options;
+    // F1：高级参数原样透传，供 buildOpenAIChatBody 组包
+    if (response_format && typeof response_format === 'object') options.response_format = response_format;
+    if (Array.isArray(tools)) options.tools = tools;
+    if (tool_choice) options.tool_choice = tool_choice;
 
     if (stream) {
       await streamOpenAIResponse(response, modelConfig, messages, options, model);
@@ -585,6 +600,31 @@ const routes = {
         sendJSON(response, { object: 'list', data });
     },
     'POST /v1/chat/completions': handleOpenAIChatCompletions,
+    // F2：/v1/embeddings 透传（走混元原生 fetch 配置，供向量化收敛到网关）
+    'POST /v1/embeddings': async (request, response) => {
+        try {
+            const body = await getBody(request);
+            const fetchConfig = getProviderFetchConfig('hunyuan');
+            if (!fetchConfig?.apiKey) {
+                return sendOpenAIError(response, 'Provider hunyuan not available', 404);
+            }
+            const upstream = await fetch(`${fetchConfig.baseURL}/embeddings`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${fetchConfig.apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            });
+            const text = await upstream.text();
+            response.writeHead(upstream.status, {
+                'Content-Type': 'application/json; charset=utf-8',
+                ...CORS_HEADERS,
+            }).end(text);
+        } catch (error) {
+            sendOpenAIError(response, error.message, 500);
+        }
+    },
 };
 
 // ---------------------------------------------------------------------------
