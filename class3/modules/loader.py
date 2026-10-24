@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
 # 知识入库：Embedding 客户端 + Chroma 向量库
-# TODO-1 建客户端，TODO-2 切块入库；供 rag_app.get_graph 取 retriever
+# [已实现] 建客户端，[已实现] 切块入库；供 rag_app.get_graph 取 retriever
 # ---------------------------------------------------------------------------
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -19,7 +19,7 @@ DEFAULT_EMBEDDING_MODEL = "kinfra-text-embedding-0.6b"
 
 
 # ---------------------------------------------------------------------------
-# TODO-1：OpenAI 兼容 Embedding（TokenHub 国内站）
+# [已实现]OpenAI 兼容 Embedding（TokenHub 国内站）
 # 供 Loader 向量化与检索使用；base_url 须以 /v1 结尾
 # ---------------------------------------------------------------------------
 def build_embeddings() -> OpenAIEmbeddings:
@@ -61,7 +61,7 @@ class Loader:
         self.data_directory = os.getenv("DATA_DIR", "./data/md")
         self.embedding = build_embeddings()
 
-    # 已有库则直接加载；REBUILD=True 时删库。缺库时走 TODO-2 建库。
+    # 已有库则直接加载；REBUILD=True 时删库。缺库时走 [已实现] 建库。
     def get_retriever(self):
         """
         加载或重建 Chroma 向量库并返回 retriever：

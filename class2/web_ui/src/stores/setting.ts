@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // 连接与模型设置（Zustand + localStorage 持久化）
-// 三模式：direct（TokenHub）/ proxy（实训二 :11434）/ rag（实训四 :14052）
+// 三模式：direct（TokenHub）/ proxy（模型网关 :11434）/ rag（知识服务 :14052）
 // 供 api.ts、ragApi.ts、SettingsPanel、HomePage 读取
 // ---------------------------------------------------------------------------
 import { create } from 'zustand'

@@ -9,7 +9,7 @@ const md = new MarkdownIt({
   html: true,
   breaks: true,
   linkify: true,
-  // TODO(实训 1.2.8 可选): 理解 highlight 回调如何实现代码块高亮与复制按钮
+  // 拓展点（可选）: 理解 highlight 回调如何实现代码块高亮与复制按钮
   highlight: function (str, lang): string {
     if (lang && hljs.getLanguage(lang)) {
       try {

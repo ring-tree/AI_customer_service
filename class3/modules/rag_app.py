@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
 # RAG 应用入口：校验 Key、组装 retriever+各链、编译图、跑一轮问答
-# get_graph 已实现；TODO-5 ask() 供 server POST /chat 与 main.py 命令行使用
+# get_graph 已实现；[已实现] ask() 供 server POST /chat 与 main.py 命令行使用
 # ---------------------------------------------------------------------------
 from dotenv import load_dotenv
 from modules.loader import Loader
@@ -49,9 +49,9 @@ def validate_env() -> None:
     except ValueError as exc:
         print(f"ERROR: {exc}\n")
         print(
-            "请编辑实训四项目根目录 .env：\n"
+            "请编辑知识服务项目根目录 .env：\n"
             "  HUNYUAN_API_KEY=sk-问答用TokenHub密钥\n"
-            "  OPENAI_API_BASE=https://tokenhub-intl.tencentmaas.com/v1\n"
+            "  OPENAI_API_BASE=https://tokenhub.tencentmaas.com/v1\n"
             "  LLM_MODEL=hy3\n"
             "  EMBEDDING_API_KEY=sk-向量化用TokenHub密钥\n"
             "  EMBEDDING_API_BASE=https://tokenhub.tencentmaas.com/v1\n"
@@ -61,7 +61,7 @@ def validate_env() -> None:
         sys.exit(1)
 
 
-# 进程内只初始化一次：Loader → 各 Model → Nodes → Graph.create（TODO-4）
+# 进程内只初始化一次：Loader → 各 Model → Nodes → Graph.create（[已实现]）
 def get_graph():
     """Lazy-init LangGraph app once per process.（已实现，可直接使用）"""
     global _graph, _nodes
@@ -91,7 +91,7 @@ def new_message_history():
     return list(_INITIAL_HISTORY)
 
 
-# TODO-5：执行一轮 graph.stream，组装 answer / sources / steps / 更新历史
+# [已实现]执行一轮 graph.stream，组装 answer / sources / steps / 更新历史
 def ask(question: str, message_history: list | None = None) -> dict:
     """
     跑一轮 RAG 问答（供 server POST /chat 与 main.py 终端复用）
@@ -135,7 +135,7 @@ def ask(question: str, message_history: list | None = None) -> dict:
         "msg number [" + str(len(message_history)) + "] assistant : " + (generation or "")
     )
 
-    # 组装引用来源（source / metadata / preview，与实训三前端契约保持一致）
+    # 组装引用来源（source / metadata / preview，与客服工作台前端契约保持一致）
     sources = []
     for doc in documents:
         metadata = getattr(doc, "metadata", None) or {}

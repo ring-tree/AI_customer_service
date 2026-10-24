@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// 实训四 RAG HTTP 封装（课上可后做）
+// 知识服务 RAG HTTP 封装（课上可后做）
 // 职责：/chat 问答、会话重置、健康检查；默认基址见 setting.DEFAULT_RAG_URL（:14052）
 // ---------------------------------------------------------------------------
 import {
@@ -34,10 +34,10 @@ export interface RagChatResponse {
 }
 
 /**
- * TODO(学生)-6：调用实训四 POST /chat
+ * [已实现]调用知识服务 POST /chat
  * body: { question, session_id }
  * 成功返回 { session_id, answer, sources, steps }
- * 供 TODO-5 的 RAG 分支调用；课上可先跳过，打通 LLM 对话后再做
+ * 供 [已实现] 的 RAG 分支调用；课上可先跳过，打通 LLM 对话后再做
  */
 export const createRagChat = async (
   question: string,
@@ -50,7 +50,7 @@ export const createRagChat = async (
     throw new Error('问题不能为空')
   }
 
-  // TODO(学生)-6
+  // [已实现]
   // F10：RAG 单问 50~95s（4~8 次串行模型调用），超时阈值 180s
   const res = await fetchWithTimeout(
     `${getRagBaseUrl(settings)}/chat`,

@@ -2,7 +2,7 @@
 # 图节点与条件边（已实现，不要改）
 # retrieve / generate / grade_documents / transform_query 写 state
 # route_question、decide_to_generate、grade_generation_... 返回下一跳名字
-# 供 Graph.create（TODO-4）挂边
+# 供 Graph.create（[已实现]）挂边
 # ---------------------------------------------------------------------------
 from dotenv import load_dotenv
 import os

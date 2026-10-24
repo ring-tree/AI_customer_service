@@ -14,7 +14,7 @@ import './SettingsPanel.scss'
 
 // ---------------------------------------------------------------------------
 // 设置面板：改 connectionMode / Key / 地址，并调用 testConnection、fetchProxyModels
-// 写回 useSettingStore；不负责发对话（发对话在 HomePage TODO-5）
+// 写回 useSettingStore；不负责发对话（发对话在 HomePage [已实现]）
 // ---------------------------------------------------------------------------
 
 interface SettingsPanelProps {
@@ -159,14 +159,14 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 className={`mode-btn ${localSettings.connectionMode === 'proxy' ? 'active' : ''}`}
                 onClick={() => handleModeChange('proxy')}
               >
-                实训二代理
+                模型网关
               </button>
               <button
                 type="button"
                 className={`mode-btn ${localSettings.connectionMode === 'rag' ? 'active' : ''}`}
                 onClick={() => handleModeChange('rag')}
               >
-                实训四 RAG
+                知识库 RAG
               </button>
             </div>
           </div>
@@ -191,7 +191,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           {localSettings.connectionMode === 'proxy' && (
             <div className="setting-item">
               <div className="setting-label-row">
-                <div className="setting-label">实训二代理地址</div>
+                <div className="setting-label">模型网关地址</div>
                 <button
                   type="button"
                   className="link-btn"
@@ -209,14 +209,14 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 onBlur={() => void loadProxyModels(localSettings.proxyUrl)}
                 placeholder={DEFAULT_PROXY_URL}
               />
-              <p className="setting-hint">实训二启动后的地址，默认 http://localhost:11434</p>
+              <p className="setting-hint">模型网关启动后的地址，默认 http://localhost:11434</p>
               {modelsError && <p className="setting-error">{modelsError}</p>}
             </div>
           )}
 
           {localSettings.connectionMode === 'rag' && (
             <div className="setting-item">
-              <div className="setting-label">实训四 RAG 地址</div>
+              <div className="setting-label">知识服务地址</div>
               <input
                 type="text"
                 className="api-key-input"
@@ -224,7 +224,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 onChange={(e) => handleChange('ragUrl', e.target.value)}
                 placeholder={DEFAULT_RAG_URL}
               />
-              <p className="setting-hint">实训四启动后的地址，默认 http://127.0.0.1:14052</p>
+              <p className="setting-hint">知识服务启动后的地址，默认 http://127.0.0.1:14052</p>
             </div>
           )}
 
@@ -271,7 +271,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                       className="tooltip-icon"
                       title={
                         localSettings.connectionMode === 'proxy'
-                          ? '实训二代理已在服务端配置 Key，此处可留空'
+                          ? '模型网关已在服务端配置 Key，此处可留空'
                           : '直连模式必须填写 API Key'
                       }
                     >
@@ -414,7 +414,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           {isRagMode && (
             <div className="setting-item">
               <p className="setting-hint">
-                RAG 模式通过实训四知识库检索回答，不支持流式响应；多轮对话由服务端 session 维护。
+                RAG 模式通过知识服务检索回答，不支持流式响应；多轮对话由服务端 session 维护。
               </p>
             </div>
           )}

@@ -17,7 +17,7 @@ import './HomePage.scss'
 
 // ---------------------------------------------------------------------------
 // 首页：落地页 UI + 客服聊天窗编排
-// 核心业务在下方 handleSend（TODO-5）；其余多为窗口状态与展示
+// 核心业务在下方 handleSend（[已实现]）；其余多为窗口状态与展示
 // ---------------------------------------------------------------------------
 
 const WELCOME_TEXT = '您好，请描述您想咨询的问题。'
@@ -180,16 +180,16 @@ const HomePage = () => {
   }
 
   /**
-   * TODO(学生)-5：发送闭环（企业前端编排层）
+   * [已实现]发送闭环（企业前端编排层）
    * 流程：
    * 1. 校验空输入 / loading
    * 2. 人工转接快捷文案可直接本地回复（已给出示例分支，可保留）
    * 3. addMessage(user) → addMessage(assistant 占位) → updateLastMessage(..., loading=true)
-   * 4. LLM 模式：取历史 messages（去掉最后一条空 assistant）→ createChatCompletion（TODO-3）
-   *    → messageHandler.handleResponse（TODO-4）→ updateLastMessage 增量更新
-   * 5. RAG 模式：createRagChat（TODO-6）→ 写入 answer/sources/steps + setRagSessionId
+   * 4. LLM 模式：取历史 messages（去掉最后一条空 assistant）→ createChatCompletion（[已实现]）
+   *    → messageHandler.handleResponse（[已实现]）→ updateLastMessage 增量更新
+   * 5. RAG 模式：createRagChat（[已实现]）→ 写入 answer/sources/steps + setRagSessionId
    * 6. catch 把错误写到助手气泡；finally setIsLoading(false)
-   * 课上先打通 LLM；RAG 分支等 TODO-6 完成后再接
+   * 课上先打通 LLM；RAG 分支等 [已实现] 完成后再接
    */
   const handleSend = async (messageContent: { text: string; files: FileItem[] }) => {
     const text = messageContent.text.trim()
@@ -203,7 +203,7 @@ const HomePage = () => {
     }
 
     try {
-      // TODO(学生)-5：补全 LLM（必做）/ RAG（依赖 TODO-6）发送与流式更新
+      // [已实现]补全 LLM（必做）/ RAG（依赖 [已实现]）发送与流式更新
       // 1) 先改标题（此时会话还没有消息），再依次写入 user 消息与 assistant 占位气泡
       // F3：文本附件内容拼入用户消息（进入 LLM 历史与 RAG 问句）；标题仍用纯文本
       const fileCtx = messageContent.files
@@ -245,7 +245,7 @@ const HomePage = () => {
     } catch (error) {
       console.error('Failed to send message:', error)
       const message = error instanceof Error ? error.message : '抱歉，发生了一些错误，请稍后重试。'
-      // 若尚未插入助手气泡，这里可能无效；实现 TODO-5 时应先插入再请求
+      // 若尚未插入助手气泡，这里可能无效；实现 [已实现] 时应先插入再请求
       updateLastMessage(message, '', 0, 0, false)
     } finally {
       setIsLoading(false)
@@ -482,7 +482,7 @@ const HomePage = () => {
                 </li>
               </ul>
               <p className="detail-tip">
-                可通过右上角设置切换「直连 API / 实训二代理 / 实训四 RAG」，客服窗将按当前模式发起对话。点击右下角悬浮球即可开始咨询。
+                可通过右上角设置切换「直连 API / 模型网关 / 知识库 RAG」，客服窗将按当前模式发起对话。点击右下角悬浮球即可开始咨询。
               </p>
             </div>
             <div className="detail-footer">

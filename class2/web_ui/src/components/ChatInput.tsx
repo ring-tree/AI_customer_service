@@ -3,7 +3,7 @@ import { FileItem } from '../stores/chat'
 import './ChatInput.scss'
 
 // ---------------------------------------------------------------------------
-// 输入区：收集文本/附件，调用 props.onSend → HomePage.handleSend（TODO-5）
+// 输入区：收集文本/附件，调用 props.onSend → HomePage.handleSend（[已实现]）
 // ---------------------------------------------------------------------------
 
 interface ChatInputProps {

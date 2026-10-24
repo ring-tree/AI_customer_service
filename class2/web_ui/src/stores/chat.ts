@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // 会话与消息状态（Zustand + localStorage）
 // 职责：多会话、增删消息、流式时 updateLastMessage 改最后一条助手气泡
-// 供 HomePage TODO-5、ChatMessage / 侧栏会话列表使用
+// 供 HomePage [已实现]、ChatMessage / 侧栏会话列表使用
 // ---------------------------------------------------------------------------
 import { create } from 'zustand'
 import { persist, devtools, createJSONStorage } from 'zustand/middleware'

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // 消息格式化与上游响应解析
 // 职责：造气泡数据；把 SSE / JSON 增量写成 updateCallback，供 HomePage 更新 UI
-// 流式约定与实训二一致（data: / [DONE] / reasoning_content）
+// 流式约定与模型网关一致（data: / [DONE] / reasoning_content）
 // ---------------------------------------------------------------------------
 import { FileItem } from '../stores/chat'
 
@@ -19,7 +19,7 @@ export interface MessageData {
 let messageIdCounter = 0
 
 export const messageHandler = {
-  // 已实现：构造一条标准消息对象，供 TODO-5 插入 user / assistant 占位气泡
+  // 已实现：构造一条标准消息对象，供 [已实现] 插入 user / assistant 占位气泡
   formatMessage(
     role: 'user' | 'assistant',
     content: string,
@@ -39,8 +39,8 @@ export const messageHandler = {
   },
 
   /**
-   * TODO(学生)-4：解析 SSE 流式响应
-   * 约定（与实训二一致）：
+   * [已实现]解析 SSE 流式响应
+   * 约定（与模型网关一致）：
    * - 行格式：data: {json}
    * - 结束：data: [DONE]
    * - 文本增量：choices[0].delta.content
@@ -55,7 +55,7 @@ export const messageHandler = {
     const reader = response.body?.getReader()
     if (!reader) return
 
-    // TODO(学生)-4：实现 buffer 按行拆分 + processChunk + emitUpdate
+    // [已实现]实现 buffer 按行拆分 + processChunk + emitUpdate
     const decoder = new TextDecoder()
     let text = ''
     let think = ''
@@ -129,7 +129,7 @@ export const messageHandler = {
     )
   },
 
-  // 已实现：按 isStream 分流到 TODO-4 或 handleNormalResponse；TODO-5 统一走这里
+  // 已实现：按 isStream 分流到 [已实现] 或 handleNormalResponse；[已实现] 统一走这里
   async handleResponse(
     response: Response | any,
     isStream: boolean,

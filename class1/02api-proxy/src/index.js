@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 /**
- * 实训二学生版：OpenAI 兼容多厂商 LLM 代理
+ * 模型网关：OpenAI 兼容多厂商 LLM 代理
  *
- * 请按实验手册逐步补全标注 TODO(学生) 的代码块。
  * 已给出的工具函数 / HTTP 骨架请直接使用，无需改动。
  */
 
 // ---------------------------------------------------------------------------
 // 启动准备：引入 HTTP / 文件 / 环境变量 / AI SDK，并换成彩色日志
-// 为 TODO-1 读取 Key、为最后 listen(PORT) 启动代理做准备
+// 为 [已实现] 读取 Key、为最后 listen(PORT) 启动代理做准备
 // ---------------------------------------------------------------------------
 import http from 'node:http';
 import fs from 'node:fs';
@@ -29,9 +28,9 @@ dotenv.config();
 const PORT = process.env.PORT || 11434;
 
 // ============================================================================
-// TODO(学生)-1：按环境变量注册四个 Provider（hunyuan / deepseek / zhipu / kimi）
+// [已实现]按环境变量注册四个 Provider（hunyuan / deepseek / zhipu / kimi）
 // 作用：把已配置 Key 的厂商装进 providers；一个都没有则退出
-// 供 /health、TODO-3 模型列表、validateModel、以及后续真正调模型使用
+// 供 /health、[已实现] 模型列表、validateModel、以及后续真正调模型使用
 // 提示：
 // - 有 Key 才注册；无 Key 则跳过
 // - 混元 Key：HUNYUAN_API_KEY 或 TOKENHUB_API_KEY
@@ -41,7 +40,7 @@ const PORT = process.env.PORT || 11434;
 // ============================================================================
 const providers = {};
 
-// TODO(学生)-1a：注册 hunyuan（课上必通）
+// [已实现]a：注册 hunyuan（课上必通）
 const hunyuanApiKey = process.env.HUNYUAN_API_KEY || process.env.TOKENHUB_API_KEY;
 if (hunyuanApiKey) {
     providers.hunyuan = createOpenAI({
@@ -53,7 +52,7 @@ if (hunyuanApiKey) {
     });
 }
 
-// TODO(学生)-1b：注册 deepseek（有 Key 时）
+// [已实现]b：注册 deepseek（有 Key 时）
 if (process.env.DEEPSEEK_API_KEY) {
     providers.deepseek = createOpenAI({
         apiKey: process.env.DEEPSEEK_API_KEY,
@@ -63,7 +62,7 @@ if (process.env.DEEPSEEK_API_KEY) {
     });
 }
 
-// TODO(学生)-1c：注册 zhipu（有 Key 时）
+// [已实现]c：注册 zhipu（有 Key 时）
 if (process.env.ZHIPU_API_KEY) {
     providers.zhipu = createOpenAI({
         apiKey: process.env.ZHIPU_API_KEY,
@@ -73,7 +72,7 @@ if (process.env.ZHIPU_API_KEY) {
     });
 }
 
-// TODO(学生)-1d：注册 kimi（有 Key 时）
+// [已实现]d：注册 kimi（有 Key 时）
 if (process.env.KIMI_API_KEY) {
     providers.kimi = createOpenAI({
         apiKey: process.env.KIMI_API_KEY,
@@ -89,9 +88,9 @@ if (Object.keys(providers).length === 0) {
 }
 
 // ---------------------------------------------------------------------------
-// TODO(学生)-2：加载模型别名表（如 hy3 → { provider: 'hunyuan', model: 'hy3' }）
+// [已实现]加载模型别名表（如 hy3 → { provider: 'hunyuan', model: 'hy3' }）
 // 有 models.json 则读取；缺失时补内置回退表
-// 供 TODO-3 列出可用模型、TODO-6 校验请求里的 model 字段
+// 供 [已实现] 列出可用模型、[已实现] 校验请求里的 model 字段
 // ---------------------------------------------------------------------------
 const DEFAULT_MODELS_PATH = path.join(process.cwd(), 'models.json');
 
@@ -101,7 +100,7 @@ try {
         models = JSON.parse(fs.readFileSync(DEFAULT_MODELS_PATH, 'utf8'));
         console.log(`✅ Loaded models from ${DEFAULT_MODELS_PATH}`);
     } else {
-        // TODO(学生)-2：models.json 缺失时的内置回退表（至少含 hy3 / deepseek-chat / glm-4-flash / kimi-k2）
+        // [已实现]models.json 缺失时的内置回退表（至少含 hy3 / deepseek-chat / glm-4-flash / kimi-k2）
         models = {
             'hy3': { provider: 'hunyuan', model: 'hy3' },
             'hy3-preview': { provider: 'hunyuan', model: 'hy3-preview' },
@@ -120,7 +119,7 @@ try {
 
 // ---------------------------------------------------------------------------
 // 工具层 A（已实现）：读 POST JSON、CORS、统一 JSON / OpenAI 错误响应
-// 供 TODO-3 列表、TODO-6 非流式返回和错误处理使用
+// 供 [已实现] 列表、[已实现] 非流式返回和错误处理使用
 // ---------------------------------------------------------------------------
 const getBody = (request) => new Promise((resolve, reject) => {
   let raw = '';
@@ -163,7 +162,7 @@ const sendOpenAIError = (response, message, status = 500, type = 'server_error')
 
 // ---------------------------------------------------------------------------
 // 工具层 B（已实现）：生成 chatcmpl- id、写 SSE data: 行、组 chunk / usage
-// 并把 promptTokens 等字段收成 OpenAI usage，供 TODO-7 / TODO-8 流式输出使用
+// 并把 promptTokens 等字段收成 OpenAI usage，供 [已实现] / [已实现] 流式输出使用
 // ---------------------------------------------------------------------------
 const newChatCompletionId = () => `chatcmpl-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
@@ -205,21 +204,21 @@ const normalizeOpenAIUsage = (usage) => {
 };
 
 /**
- * TODO(学生)-4：分流开关——混元/DeepSeek 走原生 fetch，其余走 AI SDK
+ * [已实现]分流开关——混元/DeepSeek 走原生 fetch，其余走 AI SDK
  * 混元与 DeepSeek 返回 { apiKey, baseURL }（便于透传 reasoning_content / usage）
  * 智谱 / Kimi 返回 null，后续走 AI SDK
- * 供 TODO-5 / 7 / 8 决定调用路径
+ * 供 [已实现] / 7 / 8 决定调用路径
  */
 const getProviderFetchConfig = (providerName) => {
     switch (providerName) {
-        // TODO(学生)-4a：case 'hunyuan'
+        // [已实现]a：case 'hunyuan'
         case 'hunyuan':
             return {
                 apiKey: process.env.HUNYUAN_API_KEY || process.env.TOKENHUB_API_KEY,
                 baseURL: (process.env.HUNYUAN_API_URL || process.env.TOKENHUB_API_URL
                     || 'https://tokenhub-intl.tencentmaas.com/v1').replace(/\/+$/, ''),
             };
-        // TODO(学生)-4b：case 'deepseek'
+        // [已实现]b：case 'deepseek'
         case 'deepseek':
             return {
                 apiKey: process.env.DEEPSEEK_API_KEY,
@@ -233,7 +232,7 @@ const getProviderFetchConfig = (providerName) => {
 
 // ---------------------------------------------------------------------------
 // 上游协议辅助（已实现）：组请求体、抽出思考内容、校验模型、清洗 messages
-// 供 TODO-5 非流式 fetch 与 TODO-8 SSE 组包 / 解析使用
+// 供 [已实现] 非流式 fetch 与 [已实现] SSE 组包 / 解析使用
 // ---------------------------------------------------------------------------
 const buildOpenAIChatBody = (modelConfig, messages, options = {}, stream = false) => {
     const modelName = modelConfig.model;
@@ -311,13 +310,13 @@ const prepareMessages = (messages = []) => {
 };
 
 /**
- * TODO(学生)-5：非流式生成
+ * [已实现]非流式生成
  * 分支 A：getProviderFetchConfig 有值 → 原生 fetch 上游 /chat/completions
  * 分支 B：否则 → AI SDK generateText（智谱 / Kimi）
- * 返回 { text, reasoning, usage }，供 TODO-6 在 stream=false 时组装 chat.completion
+ * 返回 { text, reasoning, usage }，供 [已实现] 在 stream=false 时组装 chat.completion
  */
 const generateResponse = async (modelConfig, messages, options = {}) => {
-  // TODO(学生)-5a：原生 fetch 分支（hunyuan / deepseek）
+  // [已实现]a：原生 fetch 分支（hunyuan / deepseek）
   const fetchConfig = getProviderFetchConfig(modelConfig.provider);
   if (fetchConfig) {
     const body = buildOpenAIChatBody(modelConfig, messages, options, false);
@@ -339,7 +338,7 @@ const generateResponse = async (modelConfig, messages, options = {}) => {
     return { text: parsed.text, reasoning: parsed.reasoning, usage: normalizeOpenAIUsage(data.usage) };
   }
 
-  // TODO(学生)-5b：AI SDK 分支（zhipu / kimi）
+  // [已实现]b：AI SDK 分支（zhipu / kimi）
   const provider = providers[modelConfig.provider];
   const model = provider(modelConfig.model);
   const validMessages = prepareMessages(messages);
@@ -357,9 +356,9 @@ const generateResponse = async (modelConfig, messages, options = {}) => {
 };
 
 /**
- * TODO(学生)-8：OpenAI 兼容上游 SSE 透传（混元 / DeepSeek）
+ * [已实现]OpenAI 兼容上游 SSE 透传（混元 / DeepSeek）
  * 要点：写 SSE 响应头 → fetch stream:true → 按行解析 data: → writeOpenAISSE → 结尾 data: [DONE]
- * 由 TODO-7a 在混元/DeepSeek 流式时调用
+ * 由 [已实现] 在混元/DeepSeek 流式时调用
  */
 const streamOpenAICompatibleFetch = async (response, modelConfig, messages, options = {}, requestedModel) => {
   const fetchConfig = getProviderFetchConfig(modelConfig.provider);
@@ -380,7 +379,7 @@ const streamOpenAICompatibleFetch = async (response, modelConfig, messages, opti
     'Connection': 'keep-alive',
   });
 
-  // TODO(学生)-8：实现上游 SSE 读取与转发（可参考手册 1.2.7）
+  // [已实现]实现上游 SSE 读取与转发（可参考手册 1.2.7）
   // 失败时也要写 error chunk + data: [DONE] 并 end()
   try {
     const upstream = await fetch(`${fetchConfig.baseURL}/chat/completions`, {
@@ -467,18 +466,18 @@ const streamOpenAICompatibleFetch = async (response, modelConfig, messages, opti
 };
 
 /**
- * TODO(学生)-7：流式总入口
- * - 若 getProviderFetchConfig 有值 → 调用 streamOpenAICompatibleFetch（TODO-8）
+ * [已实现]流式总入口
+ * - 若 getProviderFetchConfig 有值 → 调用 streamOpenAICompatibleFetch（[已实现]）
  * - 否则 → AI SDK streamText，逐段 writeOpenAISSE，结尾 [DONE]
- * 由 TODO-6 在 stream=true 时调用
+ * 由 [已实现] 在 stream=true 时调用
  */
 const streamOpenAIResponse = async (response, modelConfig, messages, options = {}, requestedModel) => {
-  // TODO(学生)-7a：原生流式分流
+  // [已实现]a：原生流式分流
   if (getProviderFetchConfig(modelConfig.provider)) {
     return streamOpenAICompatibleFetch(response, modelConfig, messages, options, requestedModel);
   }
 
-  // TODO(学生)-7b：AI SDK 流式（zhipu / kimi）
+  // [已实现]b：AI SDK 流式（zhipu / kimi）
   const provider = providers[modelConfig.provider];
   const model = provider(modelConfig.model);
   const validMessages = prepareMessages(messages);
@@ -510,15 +509,15 @@ const streamOpenAIResponse = async (response, modelConfig, messages, options = {
 };
 
 /**
- * TODO(学生)-6：POST /v1/chat/completions 总处理器
+ * [已实现]POST /v1/chat/completions 总处理器
  * 1. getBody → 校验 model / messages
  * 2. validateModel
- * 3. stream=true → streamOpenAIResponse（TODO-7）；否则 generateResponse（TODO-5）并 sendJSON
+ * 3. stream=true → streamOpenAIResponse（[已实现]）；否则 generateResponse（[已实现]）并 sendJSON
  * 挂到下方路由 POST /v1/chat/completions；catch 已写好（头未发出走 JSON 错误，已发出补 [DONE]）
  */
 const handleOpenAIChatCompletions = async (request, response) => {
   try {
-    // TODO(学生)-6：补全本函数
+    // [已实现]补全本函数
     const body = await getBody(request);
     // F1：解构补 response_format / tools / tool_choice（结构化输出与工具调用透传）
     const { model, messages = [], stream = false, temperature, top_p, max_tokens, stream_options, response_format, tools, tool_choice } = body;
@@ -574,7 +573,7 @@ const handleOpenAIChatCompletions = async (request, response) => {
 
 // ---------------------------------------------------------------------------
 // 路由表：按「方法 + 路径」分发
-// GET / 与 GET /health 已实现；TODO-3 补模型列表；POST 接到 TODO-6
+// GET / 与 GET /health 已实现；[已实现] 补模型列表；POST 接到 [已实现]
 // ---------------------------------------------------------------------------
 const routes = {
     'GET /': (request, response) => response.end('Multi-provider LLM proxy (OpenAI-compatible).'),
@@ -585,8 +584,8 @@ const routes = {
         providers: Object.keys(providers),
         models: Object.keys(models).filter(name => providers[models[name]?.provider]),
     }),
-    // TODO(学生)-3：只返回「已配置 Key」的模型列表（OpenAI list 格式）
-    // 供实训三前端拉模型下拉框；依赖 TODO-1 的 providers 与 TODO-2 的 models 表
+    // [已实现]只返回「已配置 Key」的模型列表（OpenAI list 格式）
+    // 供客服工作台前端拉模型下拉框；依赖 [已实现] 的 providers 与 [已实现] 的 models 表
     'GET /v1/models': (request, response) => {
         // 提示：Object.entries(models).filter(...).map(...) → { object:'list', data }
         const data = Object.entries(models)
@@ -658,7 +657,7 @@ proxyServer.listen(PORT, () => {
     const availableModels = Object.keys(models).filter(name => providers[models[name]?.provider]);
 
     console.log(`🚀 LLM Proxy running on http://localhost:${PORT}`);
-    console.log(`🔑 Providers: ${Object.keys(providers).join(', ') || '(none — 请完成 TODO-1)'}`);
+    console.log(`🔑 Providers: ${Object.keys(providers).join(', ') || '(none — 请完成 [已实现])'}`);
     console.log(`📋 Available models: ${availableModels.join(', ') || '(none)'}`);
     if (availableModels.length === 0) {
         console.warn('⚠️ 没有可用模型：请完成 Provider 注册，并确认 models.json 与 Key 对应');

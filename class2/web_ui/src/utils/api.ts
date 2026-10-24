@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
-// 上游地址与 OpenAI 兼容请求（实训三核心）
+// 上游地址与 OpenAI 兼容请求（客服工作台核心）
 // 职责：按连接模式选基址 → 拼 /v1 路径 → 测连/拉模型 → 发起对话
-// 对接：直连 TokenHub（Vite /tokenhub 代理）或实训二代理（默认 :11434）
+// 对接：直连 TokenHub（Vite /tokenhub 代理）或模型网关（默认 :11434）
 // ---------------------------------------------------------------------------
 import {
   useSettingStore,
@@ -38,29 +38,29 @@ export const fetchWithTimeout = (url: string, options: RequestInit = {}, ms = 60
 }
 
 // ---------------------------------------------------------------------------
-// TODO-1 / TODO-2：路径拼接 + 按 connectionMode 选择上游基址
-// 供下方 getChatCompletionsUrl / getModelsUrl / getHealthUrl 以及 TODO-3 使用
+// [已实现] / [已实现]路径拼接 + 按 connectionMode 选择上游基址
+// 供下方 getChatCompletionsUrl / getModelsUrl / getHealthUrl 以及 [已实现] 使用
 // ---------------------------------------------------------------------------
 /**
- * TODO(学生)-1：把 base 拼成 OpenAI 风格路径
+ * [已实现]把 base 拼成 OpenAI 风格路径
  * - 若 base 已以 /v1 结尾 → `${base}/${resource}`
  * - 否则 → `${base}/v1/${resource}`
  */
 const appendOpenAIPath = (base: string, resource: string): string => {
   const normalized = normalizeBaseUrl(base)
-  // TODO(学生)-1
+  // [已实现]
   if (normalized.endsWith('/v1')) return `${normalized}/${resource}`
   return `${normalized}/v1/${resource}`
 }
 
 /**
- * TODO(学生)-2：按 connectionMode 选择上游基址
+ * [已实现]按 connectionMode 选择上游基址
  * - rag → ragUrl
  * - proxy → proxyUrl || DEFAULT_PROXY_URL
  * - direct → apiBaseUrl || DEFAULT_API_BASE_URL
  */
 export const getServiceBaseUrl = (settings: Settings): string => {
-  // TODO(学生)-2
+  // [已实现]
   if (settings.connectionMode === 'rag') {
     return normalizeBaseUrl(settings.ragUrl || DEFAULT_RAG_URL)
   }
@@ -72,8 +72,8 @@ export const getServiceBaseUrl = (settings: Settings): string => {
 }
 
 // ---------------------------------------------------------------------------
-// 已实现：在 TODO-1/2 之上组装 completions / models / health 地址，并带上 Bearer
-// 供测连、拉代理模型列表、TODO-3 发对话使用
+// 已实现：在 [已实现]/2 之上组装 completions / models / health 地址，并带上 Bearer
+// 供测连、拉代理模型列表、[已实现] 发对话使用
 // ---------------------------------------------------------------------------
 export const getChatCompletionsUrl = (settings: Settings) => {
   const base = getServiceBaseUrl(settings)
@@ -102,7 +102,7 @@ const buildHeaders = (settings: Settings) => {
 
 // ---------------------------------------------------------------------------
 // 已实现：设置面板用的「拉代理模型」与「测试连接」
-// 依赖 TODO-1/2；RAG 模式转调 ragApi.testRagConnection
+// 依赖 [已实现]/2；RAG 模式转调 ragApi.testRagConnection
 // ---------------------------------------------------------------------------
 export const fetchProxyModels = async (proxyUrl?: string): Promise<ModelOption[]> => {
   const settings = useSettingStore.getState().settings
@@ -121,7 +121,7 @@ export const fetchProxyModels = async (proxyUrl?: string): Promise<ModelOption[]
   const models = Array.isArray(data?.data) ? data.data : []
 
   if (models.length === 0) {
-    throw new Error('代理服务未返回可用模型，请确认实训二已启动并配置了 API Key')
+    throw new Error('代理服务未返回可用模型，请确认模型网关已启动并配置了 API Key')
   }
 
   return models.map((item: { id: string }) => ({
@@ -167,11 +167,11 @@ export const testConnection = async (settings: Settings) => {
 }
 
 // ---------------------------------------------------------------------------
-// TODO-3：发起 OpenAI 兼容对话（POST chat/completions）
-// 供 HomePage TODO-5 的 LLM 分支调用；流式时返回 Response 交给 messageHandler
+// [已实现]发起 OpenAI 兼容对话（POST chat/completions）
+// 供 HomePage [已实现] 的 LLM 分支调用；流式时返回 Response 交给 messageHandler
 // ---------------------------------------------------------------------------
 /**
- * TODO(学生)-3：发起 OpenAI 兼容对话请求
+ * [已实现]发起 OpenAI 兼容对话请求
  * 要点：
  * 1. 用 getEffectiveModel 取模型名；直连模式必须有 apiKey
  * 2. body：model / messages / stream / max_tokens / temperature / top_p
@@ -183,7 +183,7 @@ export const createChatCompletion = async (
   messages: Array<{ role: string; content: string }>
 ) => {
   const setting = useSettingStore.getState().settings
-  // TODO(学生)-3
+  // [已实现]
   const model = getEffectiveModel(setting)
 
   if (!model) {

@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
-# FastAPI：端口默认 14052，给实训三「RAG 模式」对接
-# /health、/chat/reset 已实现；TODO-6 补 POST /chat（调 rag_app.ask）
+# FastAPI：端口默认 14052，给客服工作台「RAG 模式」对接
+# /health、/chat/reset 已实现；[已实现] 补 POST /chat（调 rag_app.ask）
 # ---------------------------------------------------------------------------
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,14 +48,14 @@ def startup():
 
 @app.get("/")
 def root():
-    """服务探活说明（前端请用实训三 RAG 模式，或调用下方 API）。"""
+    """服务探活说明（前端请用客服工作台 RAG 模式，或调用下方 API）。"""
     return {
         "service": "LangGraphRAG",
         "status": "ok",
         "health": "/health",
         "chat": "POST /chat",
         "reset": "POST /chat/reset",
-        "note": "UI 请使用实训三「RAG 模式」对接本服务",
+        "note": "UI 请使用客服工作台「RAG 模式」对接本服务",
     }
 
 
@@ -101,7 +101,7 @@ def chat(req: ChatRequest):
     )
 
 
-# 已实现：实训三重新生成前可调用，清掉该 session 历史
+# 已实现：客服工作台重新生成前可调用，清掉该 session 历史
 @app.post("/chat/reset")
 def reset_chat(session_id: Optional[str] = None):
     if session_id and session_id in _sessions:

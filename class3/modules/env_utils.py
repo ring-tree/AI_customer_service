@@ -38,8 +38,8 @@ def validate_llm_api_key(value: str) -> None:
     )
     if bad:
         raise ValueError(
-            "LLM API Key 无效或未配置，请在实训四 .env 中填写 TokenHub 混元 API Key"
-            "（HUNYUAN_API_KEY 或 OPENAI_API_KEY，可与实训二共用）。"
+            "LLM API Key 无效或未配置，请在知识服务 .env 中填写 TokenHub 混元 API Key"
+            "（HUNYUAN_API_KEY 或 OPENAI_API_KEY，可与模型网关共用）。"
         )
 
 
@@ -47,6 +47,6 @@ def validate_embedding_api_key(value: str) -> None:
     assert_ascii_api_key("EMBEDDING_API_KEY / HUNYUAN_API_KEY", value)
     if not value:
         raise ValueError(
-            "缺少 Embedding API Key，请在实训四 .env 中填写 TokenHub Key"
+            "缺少 Embedding API Key，请在知识服务 .env 中填写 TokenHub Key"
             "（推荐 HUNYUAN_API_KEY / EMBEDDING_API_KEY，可与对话共用）。"
         )

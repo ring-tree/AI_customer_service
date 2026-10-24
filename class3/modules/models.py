@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
 # LLM 链：路由 / 检索打分 / 生成 / 幻觉打分 / 答案打分 / 问句改写
-# 对话走 TokenHub 混元（可与实训二共用 Key）；仅 TODO-3a/3b 需填客服 Prompt
+# 对话走 TokenHub 混元（可与模型网关共用 Key）；仅 [已实现]/3b 需填客服 Prompt
 # ---------------------------------------------------------------------------
 from typing import Literal
 
@@ -16,7 +16,7 @@ from modules.env_utils import read_env_value, validate_llm_api_key
 load_dotenv(override=True)
 
 DEFAULT_LLM_MODEL = "hy3"
-# F5：默认基址改中国站（课程 Key 属中国站，国际站默认会 401/401002）
+# F5：默认基址改中国站（项目 Key 属中国站，国际站默认会 401/401002）
 DEFAULT_LLM_API_BASE = "https://tokenhub.tencentmaas.com/v1"
 
 LLM_MODEL = os.getenv("LLM_MODEL", DEFAULT_LLM_MODEL)
@@ -70,7 +70,7 @@ def _chat_llm(temperature: float = 0):
     return ChatOpenAI(**kwargs)
 
 
-# TODO-3a：客服路由 Prompt；输出 vectorstore | casual_convo，供 nodes.route_question
+# [已实现]客服路由 Prompt；输出 vectorstore | casual_convo，供 nodes.route_question
 class Router:
     class RouteQuery(BaseModel):
         """Route a user query to the most relevant datasource."""
@@ -132,7 +132,7 @@ class DocGrader:
         return DocGrader.retrieval_grader
 
 
-# TODO-3b：客服生成 Prompt（只答库内、禁编资费、不确定转人工），供 nodes.generate
+# [已实现]客服生成 Prompt（只答库内、禁编资费、不确定转人工），供 nodes.generate
 class Generator:
     prompt = ChatPromptTemplate.from_messages(
         [
