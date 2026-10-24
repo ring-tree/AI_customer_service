@@ -70,5 +70,9 @@ record("T7 POST /chat/reset", st == 200 and j5.get("ok") is True, f"HTTP {st} {j
 st, j6, dt = req("POST", "/chat", {"question": ""})
 record("T8 空问题校验", st in (400, 422), f"HTTP {st} detail={str(j6)[:100]}")
 
+# T9 F6：纯空白问题应即时 400（不进检索环）
+st, j7, dt = req("POST", "/chat", {"question": "   "})
+record("T9 纯空白问题拦截", st == 400 and dt < 1.0, f"HTTP {st} {dt:.3f}s detail={str(j7)[:80]}")
+
 print("\n==== 汇总 ====")
 print(f"通过 {sum(1 for _, ok, _ in RESULTS if ok)}/{len(RESULTS)}")

@@ -105,5 +105,29 @@ record("T7 流式对话 SSE", done and len(stream_content) > 0,
 st, raw, dt, _ = req("POST", "/v1/chat/completions", {"model": "gpt-4o", "messages": [{"role": "user", "content": "hi"}]})
 record("T8 未支持模型", st == 404, f"HTTP {st} body={raw.decode('utf-8', 'ignore')[:100]}")
 
+# 9 F1：response_format 结构化输出透传（输出须符合 schema）
+st, raw, dt, _ = req("POST", "/v1/chat/completions", {
+    "model": "hy3",
+    "messages": [{"role": "user", "content": "返回一个对象，ok 为 true"}],
+    "max_tokens": 4096,
+    "response_format": {"type": "json_schema", "json_schema": {"name": "t", "strict": True,
+        "schema": {"type": "object", "properties": {"ok": {"type": "boolean"}},
+                   "required": ["ok"], "additionalProperties": False}}},
+})
+try:
+    c9 = json.loads(raw)["choices"][0]["message"]["content"]
+    ok9 = isinstance(json.loads(c9), dict) and "ok" in json.loads(c9)
+except Exception:
+    c9, ok9 = raw.decode("utf-8", "ignore")[:60], False
+record("T9 response_format 透传", st == 200 and ok9, f"HTTP {st} {dt:.1f}s content={c9!r} schema解析={ok9}")
+
+# 10 F2：/v1/embeddings 透传（1024 维）
+st, raw, dt, _ = req("POST", "/v1/embeddings", {"model": "kinfra-text-embedding-0.6b", "input": "你好"})
+try:
+    dims = len(json.loads(raw)["data"][0]["embedding"])
+except Exception:
+    dims = -1
+record("T10 embeddings 透传", st == 200 and dims == 1024, f"HTTP {st} {dt:.2f}s dims={dims}")
+
 print("\n==== 汇总 ====")
 print(f"通过 {sum(1 for _, ok, _ in RESULTS if ok)}/{len(RESULTS)}")
