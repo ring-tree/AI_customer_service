@@ -11,8 +11,9 @@ debug_mode = os.getenv("DEBUG") == "True"
 
 
 class Nodes:
-    REGENERATION_THRESHOLD = int(os.getenv("REGENERATION_THRESHOLD"))
-    RERETREVIAL_THRESHOLD = int(os.getenv("RERETREVIAL_THRESHOLD"))
+    # F4：缺省兜底（.env 漏配时不再启动崩溃），默认 5/3
+    REGENERATION_THRESHOLD = int(os.getenv("REGENERATION_THRESHOLD", "5"))
+    RERETREVIAL_THRESHOLD = int(os.getenv("RERETREVIAL_THRESHOLD", "3"))
     REGENERATION_COUNT = 0
     RERETREVIAL_COUNT = 0
     

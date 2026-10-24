@@ -26,7 +26,8 @@ _sessions: dict[str, list] = {}
 
 
 class ChatRequest(BaseModel):
-    question: str = Field(..., min_length=1, description="User question")
+    # F6：max_length 补 2000 上限；空白拦截在 chat() 入口做
+    question: str = Field(..., min_length=1, max_length=2000, description="User question")
     session_id: Optional[str] = Field(
         None, description="Optional session id for multi-turn chat"
     )
@@ -73,6 +74,10 @@ def chat(req: ChatRequest):
     - ValueError → 400；其它异常 → 500
     """
     session_id = req.session_id or str(uuid4())
+
+    # F6：纯空白问题前置拦截（否则进入检索环烧满 4 轮熔断，实测 134s+）
+    if not req.question.strip():
+        raise HTTPException(status_code=400, detail="question 不能为空或全为空白字符")
 
     # 未知 session_id 会以新历史开始（前端拿到返回的 session_id 后会持久化复用）
     history = _sessions.get(session_id)

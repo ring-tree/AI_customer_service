@@ -16,7 +16,8 @@ from modules.env_utils import read_env_value, validate_llm_api_key
 load_dotenv(override=True)
 
 DEFAULT_LLM_MODEL = "hy3"
-DEFAULT_LLM_API_BASE = "https://tokenhub-intl.tencentmaas.com/v1"
+# F5：默认基址改中国站（课程 Key 属中国站，国际站默认会 401/401002）
+DEFAULT_LLM_API_BASE = "https://tokenhub.tencentmaas.com/v1"
 
 LLM_MODEL = os.getenv("LLM_MODEL", DEFAULT_LLM_MODEL)
 LLM_API_KEY = read_env_value(
@@ -30,7 +31,10 @@ LLM_API_BASE = os.getenv(
     os.getenv("HUNYUAN_API_URL", os.getenv("TOKENHUB_API_URL", DEFAULT_LLM_API_BASE)),
 ).rstrip("/")
 
-validate_llm_api_key(LLM_API_KEY)
+# F7：模块级校验改为惰性——由 rag_app.validate_env() 统一给出中文指引后退出，
+# 避免缺 Key 时用户直接看到裸 traceback
+def ensure_llm_key_valid() -> None:
+    validate_llm_api_key(LLM_API_KEY)
 
 
 # 已实现：混元结构化输出默认 json_schema，避免 function_calling 502

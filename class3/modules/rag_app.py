@@ -11,12 +11,13 @@ from modules.models import (
     HallucinationGrader,
     AnswerGrader,
     QuestionRewriter,
+    ensure_llm_key_valid,
 )
 from modules.nodes import Nodes
 from modules.graph import Graph
 import sys
 
-from modules.env_utils import read_env_value, validate_embedding_api_key, validate_llm_api_key
+from modules.env_utils import read_env_value, validate_embedding_api_key
 
 load_dotenv(override=True)
 
@@ -43,7 +44,7 @@ def validate_env() -> None:
     )
 
     try:
-        validate_llm_api_key(llm_key)
+        ensure_llm_key_valid()
         validate_embedding_api_key(embed_key)
     except ValueError as exc:
         print(f"ERROR: {exc}\n")

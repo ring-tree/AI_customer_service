@@ -1,3 +1,4 @@
+# 固定版本见 requirements.lock.txt；关键包：chromadb==1.5.9, langgraph==1.0.1, openai==2.54.0, fastapi==0.115.9, pydantic==2.14.1
 openai
 tiktoken
 langchain>=0.2,<0.4
