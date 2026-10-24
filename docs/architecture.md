@@ -1,5 +1,7 @@
 # class1 / class2 / services/knowledge-rag 三项目协同关系分析
 
+> 注：本文写于 2026-10-13（classN 时期）。目录已重命名为 services/model-gateway、web/customer-console、services/knowledge-rag；文中 classN 为当时服务代号。
+
 > 分析对象：`services/model-gateway`（A1 统一模型服务）、`web/customer-console`（A2 客服工作台）、`services/knowledge-rag`（A3 LangGraphRAG 知识服务）
 > 分析日期：2026-10-13 ｜ 依据：三个项目全部源码通读 + class1/class2 实测结论 + services/knowledge-rag 代码级核查
 

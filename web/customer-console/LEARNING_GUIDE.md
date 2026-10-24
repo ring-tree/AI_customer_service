@@ -1,5 +1,7 @@
 # LLM Chat React 项目学习指南
 
+> 注：本文为历史学习笔记，文中目录与端口口径已按当前结构修正（入口 src/main.tsx、页面 src/views/HomePage.tsx、端口 3098）。
+
 ## 📋 项目概述
 
 这是一个从 Vue 重构到 React 的 LLM 聊天应用，具有以下特点：
@@ -19,7 +21,7 @@
 #### 2. 入口文件分析
 - `src/main.tsx`: React 应用入口，使用 `RouterProvider`
 - `src/router/index.tsx`: 路由配置文件（已重构）
-- `src/App.tsx`: 当前为空，路由已迁移到单独文件
+- `src/main.tsx（路由在 src/router/index.tsx）`: 当前为空，路由已迁移到单独文件
 
 ### 第二阶段：核心组件学习（2-3小时）
 
@@ -37,7 +39,7 @@
   - 深度思考内容展示
 - **`ChatInput.tsx`**: 消息输入组件
   - 文件上传、消息发送
-- **`ChatView.tsx`**: 聊天主界面
+- **`HomePage.tsx`**: 聊天主界面
   - 消息列表、输入区域、侧边栏
 - **`HomePage.tsx`**: 首页
   - 项目介绍、功能展示
@@ -111,7 +113,7 @@ useEffect(() => {
 3. **`src/main.tsx`** → 应用入口和路由提供者
 4. **`src/router/index.tsx`** → 路由配置（已重构）
 5. **`src/stores/chat.ts`** → 状态管理核心
-6. **`src/views/ChatView.tsx`** → 主界面组件
+6. **`src/views/HomePage.tsx`** → 主界面组件
 7. **`src/components/ChatMessage.tsx`** → 核心展示组件
 8. **`src/utils/markdown.ts`** → 工具函数示例
 
@@ -124,7 +126,7 @@ npm install
 # 2. 启动开发服务器
 npm run dev
 
-# 3. 打开浏览器访问 http://localhost:5173
+# 3. 打开浏览器访问 http://localhost:3098
 
 # 4. 构建生产版本
 npm run build
@@ -175,14 +177,14 @@ npm run preview
 
 ## 🔄 项目重构示例：路由配置
 
-### 重构前（直接在 App.tsx）
+### 重构前（路由直接写在入口文件）
 ```typescript
-// src/App.tsx
+// src/main.tsx（路由在 src/router/index.tsx）
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/chat" element={<ChatView />} />
+      <Route path="/chat" element={<HomePage />} />
     </Routes>
   )
 }
@@ -198,7 +200,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/chat',
-    element: <ChatView />
+    element: <HomePage />
   }
 ])
 
@@ -239,7 +241,7 @@ const router = createBrowserRouter([
 ### Q1: 项目启动失败怎么办？
 - 检查 Node.js 版本（建议 18+）
 - 删除 node_modules 重新安装：`rm -rf node_modules && npm install`
-- 检查端口占用：`netstat -ano | findstr :5173`
+- 检查端口占用：`netstat -ano | findstr :3098`
 
 ### Q2: 如何理解 Zustand 状态管理？
 - Zustand 是轻量级状态管理库

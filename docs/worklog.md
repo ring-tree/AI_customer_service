@@ -1,7 +1,53 @@
 # 项目工作日志
 
+> 注：历史记录。项目早期按实训框架（classN 目录与文案）组织，2026-10-24~25 完成去课程化整改与目录重命名；文中 classN/实训 字样为当时实录，不改写。
+
 > 项目：企业智能客服三件套（class1 统一模型服务 ｜ class2 客服工作台 ｜ services/knowledge-rag LangGraphRAG）
 > 维护约定：按日期记录，**最新日期置顶**；配套证据统一存放于 `tests/evidence/`。
+
+---
+
+## 2026-10-25（周六，跨 10-24 夜）
+
+### 今日概览
+
+按《实施指导手册-整改与修复.md》完成**全部 8 个阶段的整改与修复**（A0-A8 + F1-F12，F13 按手册明确不做），全程 git 分段提交可回滚。执行明细见 `docs/整改进度与任务日志.md`（S0-S7 分阶段日志）。
+
+1. **阶段 0（A0）** ✅ —— git 基线（199 文件，密钥/依赖/向量库未追踪）+ 备份
+2. **阶段 1-3（F1-F12）** ✅ —— 网关透传/embeddings/流式去重、前端附件/默认模式/超时、知识服务阈值/基址/空白拦截/惰性校验/依赖锁定/契约测试
+3. **阶段 4 回归** ✅ —— 网关 10/10、知识服务 9/9、UI 4/4、契约 OK、构建 0 错
+4. **阶段 5 文案层（A1-A5）** ✅ —— 知识库去课程化+重建向量库、UI 文案、TODO 注释 91 处、包元数据、配置注释
+5. **阶段 6 重命名（A6/A7）** ✅ —— services/web/tests/docs 语义化布局，296 处引用替换
+6. **阶段 7 收尾（A8+终验收）** ✅ —— 文档重写与物料归档，三模式实测通过
+
+### 任务记录（按 `Agent.md` 规范）
+
+#### T-20261025-01 ｜ 按实施手册完成全量整改与修复（A0-A8 / F1-F12）
+
+- **任务时间**：2026-10-24 22:10 → 2026-10-25 01:40（GMT+8，累计约 3.5 小时，跨阶段停机窗口 2 次）
+- **任务输入**：
+  - 用户诉求：本机有 git，先用本地版本管理；确认无误后按《实施指导手册-整改与修复.md》执行整改；因涉及范围大，维护任务日志与进度表，完成一段进度即提交 git，便于异常中断后恢复
+  - 引用/前置：当日三服务全量验证通过（venv 已用标准 Python 3.13 重建）；手册 8 阶段流程与 4.4 交付验收清单
+- **执行过程**：
+  1. A0：`git init` + `.gitignore`（密钥/依赖/向量库/备份均不追踪，目视复核）→ 基线 `ae325c3` → `.env`×2、`db_md`、`data/md` 备份至 `_archive/backup-2026-10-24/`
+  2. 建 `整改进度与任务日志.md`（进度表 + S 系列日志，哈希回填机制），后续每阶段提交并更新
+  3. 阶段 1（class1）：F1 请求解构/options/组包三处透传 `response_format/tools/tool_choice`；F2 新增 `/v1/embeddings`；F9 `finishSent` 去重。单测 3/3 + 回归 8/8 → `487dbc8`
+  4. 阶段 2（class2）：F3 收敛档（FileItem.content + `.txt/.md/.csv` 读取截断 8000 + fullText 拼入 LLM/RAG 双路径）；F8 默认 `proxy`；F10 `fetchWithTimeout` 全量替换（60/15/180/10s + TypeError 中文映射）。Chrome headless CDP(9445)：UI 冒烟 4/4、X1 默认模式、X2 附件口令被答出、X3 挂起服务器 10s 超时提示 → `a4fb7ed`
+  5. 阶段 3（class3）：F4 阈值默认 5/3；F5 默认基址中国站（models.py + .env.example）；F6 空白 400 拦截（102ms，原 134s+）；F7 惰性 `ensure_llm_key_valid()`；F11 `requirements.lock.txt`（124 包）；F12 契约测试 CONTRACT-OK。单测 3/3 + 回归 8/8 → `f70d170`
+  6. 阶段 4：脚本扩用例（T9/T10/T9）全量复跑：网关 10/10、知识服务 9/9、UI 4/4、契约 OK、build ✓ → `aea67f3`
+  7. 阶段 5：A1 知识库 15 处替换 + 重建向量库（154 chunks，数据层 0 课程块/5 新文案块 + RAG 实问验证）；A2 UI 9 处；A3 TODO 重标注 91 处 + 注释实训映射 22 处（发现并修复 python 文本模式 CRLF→LF 问题，diff 2721→123 行）；A4 包元数据（model-gateway/customer-console）；A5 配置注释与指引（含 rag_app 示例基址 intl→中国站）→ `5d392e2`
+  8. 阶段 6：停机窗口 PowerShell 按映射表移动（203 renames）；A7 引用替换 296 处（长路径优先）；修复裸 `class3` 替换误伤的契约测试变量名与 `t_passthrough.py` 路径；`check_log.py` → docs/worklog.md；新路径三服务健康 200 → `b4e4f89`
+  9. 阶段 7：重写根 README（个人项目口吻）与三子项目 README；LEARNING_GUIDE 修正失实路径/端口（App.tsx/ChatView/5173 清零）；Agent.md 刷新（含 3.13t 告警、git 事实修正）；手册与 README.full 归档 docs/archive/；过程文档加历史注记
+  10. 终验收：三模式实测（直连经 Vite 代理 200/4.6s、网关 200/1.8s、RAG 200/70s 含 4 引用来源且无课程字样；RAG 首发遇手册已记载的混元瞬态 400，重发即过）；关键词扫描仅 docs/ 过程文档命中；check_log 13/13；build ✓；npm ls / pip check 无异常
+- **任务产出**：
+  - 提交链：`ae325c3` → `487dbc8` → `a4fb7ed` → `f70d170` → `aea67f3` → `5d392e2` → `b4e4f89` → `ece4c84` → 阶段 7 提交（见 `git log`）
+  - 布局：`services/{model-gateway,knowledge-rag}`、`web/customer-console`、`tests/evidence`、`docs/{worklog,architecture,整改进度与任务日志}.md`、`docs/archive/`、`_archive/course-materials/`
+  - 测试：网关 10/10、知识服务 9/9、UI 4/4 + 补充用例 4 项、契约 OK、build 0 错、pip check 干净；证据 `tests/evidence/deploy-2026-10-24/`（截图 07 张、结果 JSON、日志）
+- **问题与遗留**：
+  - RAG 偶发 400（混元非严格 JSON）为上游瞬态，重试机制已在，仍偶发——登记于 F13 可选批次之外的上游问题
+  - 熔断计数类级共享（并发串扰）、会话内存态等教学版限制未动（F13/O 系列待办）
+  - `web/customer-console` 的 `npm run lint` 仍缺 ESLint 配置（手册 O6，未列本轮）
+- **环境终态**：见本轮最后操作记录（三服务关闭、端口释放）
 
 ---
 
